@@ -71,16 +71,7 @@ head -1000 hs_exp_data/hs_unrecurrence_novel_gtf_data.txt | awk {'print $1,$2,$3
 head -1000 hs_exp_data/hs_recurrence_novel_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_recurrence_novel_gtf_data3.txt
 head -1000 hs_exp_data/hs_recurrence_know_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_recurrence_know_gtf_data3.txt
 
-
 /disk/soft/circos-0.69-6/bin/circos -conf circoshhj_test.conf
-
-
-cat hs_exp_data/hs_normal_know_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_exp_data/hs_normal_know_gtf_data2.txt
-cat hs_exp_data/hs_normal_novel_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_exp_data/hs_normal_novel_gtf_data2.txt
-cat hs_exp_data/hs_unrecurrence_know_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_exp_data/hs_unrecurrence_know_gtf_data2.txt
-cat hs_exp_data/hs_unrecurrence_novel_gtf_data.txt | awk {'print $1,$2,$3,$4'}>hs_exp_data/hs_unrecurrence_novel_gtf_data2.txt
-cat hs_exp_data/hs_recurrence_novel_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_exp_data/hs_recurrence_novel_gtf_data2.txt
-cat hs_exp_data/hs_recurrence_know_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_exp_data/hs_recurrence_know_gtf_data2.txt
 
 /disk/soft/circos-0.69-6/bin/circos -conf circoshhj.conf
 
