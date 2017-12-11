@@ -275,15 +275,13 @@ cat percentages25novel.Amp.geneid.txt percentages25known.Amp.geneid.txt>percenta
 
 /disk/soft/circos-0.69-6/bin/circos -conf circoscnvright.conf 
 
+#test
 head -100 uniq_rec_DESeq2_edgeR_up_gene_for_circos.txt>uniq_rec_DESeq2_edgeR_up_gene_for_circos2.txt
 head -100 uniq_rec_DESeq2_edgeR_down_gene_for_circos.txt> uniq_rec_DESeq2_edgeR_down_gene_for_circos2.txt
 head -100 uniq_normal_DESeq2_edgeR_up_gene_for_circos.txt>uniq_normal_DESeq2_edgeR_up_gene_for_circos2.txt
 head -100 uniq_normal_DESeq2_edgeR_down_gene_for_circos.txt >uniq_normal_DESeq2_edgeR_down_gene_for_circos2.txt
-
-
 head -10000 ../Del_19_38scores.sorted.gistic >../Del_19_38scores.sorted.gistic2
 head -10000 ../Amp_19_38scores.sorted.gistic >../Amp_19_38scores.sorted.gistic2
-
 /disk/soft/circos-0.69-6/bin/circos -conf circoscnvtest.conf
 
 
