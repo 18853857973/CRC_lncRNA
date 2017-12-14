@@ -325,3 +325,28 @@ cd  /disk/zhw/CRClncRNA/cnv/differentgene_updown_heatmap
 sh foralllcancer13.sh 
 sh Del_negetive_num.sh 
 #Del改为负数
+
+#chip-seq
+fastq-dump SRR577511 SRR577511.fastq
+
+bowtie /disk/database/human/hg38/Gencode/bowtie_index/bowtie_genome SRR577511.fastq SRR577511.sam
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
