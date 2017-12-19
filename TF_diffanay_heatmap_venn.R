@@ -8,6 +8,7 @@ library(ggplot2)
 library(ggpubr)
 library(ggsignif)
 
+
 #肿瘤的vs正常的：上调和下调
 
 countData_normal=read.table('data_normal.txt',sep='\t',header = T,stringsAsFactors = F)
@@ -32,7 +33,7 @@ lfc=1
 pval=0.05
 args='tumor_vs_normal'
 
-res_down_normal <- subset(res_normal,log2FoldChange > lfc& pvalue < pval)
+res_down_normal <- subset(res_normal,log2FoldChange >= lfc& pvalue <= pval)
 res_up_normal <- subset(res_normal, log2FoldChange < -lfc&pvalue < pval)
 res_normal<- rbind(res_up_normal,res_down_normal)
 

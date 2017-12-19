@@ -1,6 +1,6 @@
 setwd('D:\\CRC_lncRNA\\filter\\RSEM_expression')
-
-data=read.table('lncRNA.rsem.FPKM.txt',header = T,stringsAsFactors = F,sep = '\t')
+#样本按照肿瘤和正常排序
+data=read.table('lncRNA.rsem.FPKM.txt',header = T,stringsAsFactors = F,sep = '\t',check.names = F)
 
 samplename=strsplit(colnames(data),split="_",fixed=T)
 rown=c()
@@ -13,8 +13,7 @@ colnames(data)=rown
 data=data[,sort(rown)]
 write.table(data,'lncRNA.rsem.FPKM_sort.txt',quote = F,sep='\t')
 
-
-data2=read.table('lncRNA.rsem.FPKM_sort.txt',header = T,stringsAsFactors = F,sep = '\t')
+data2=read.table('D:\\CRC_lncRNA\\filter\\RSEM_expression\\lncRNA.rsem.FPKM_sort.txt',header = T,stringsAsFactors = F,sep = '\t',check.names = F)
 data=matrix(as.numeric(unlist(data2)),ncol=40)
 rowmean_data=data.frame(rowMeans(data[,c(1:10)]),rowMeans(data[,c(11:20)]),rowMeans(data[,c(21:30)]),rowMeans(data[,c(31:40)]))
 colnames(rowmean_data)=c("A","B","C","D")
@@ -26,6 +25,8 @@ gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA.final.v2.cp.2.txt',sep = '\t',str
 colnames(gtf)=c("chr","known","start","end","geneid")
 
 data2=data.frame(rownames(rowmean_data),rowmean_data)
+#筛选出转录活性的lncRNA
+data2=data2[data2[,1]%in%lncRNA_TF,]
 
 colnames(data2)=c("geneid",colnames(rowmean_data))
 gtf_data=merge(gtf,data2,by="geneid",sort = F)
@@ -49,8 +50,12 @@ write.table(normal_know_gtf_data,'hs_normal_know_gtf_data.txt',quote = F,col.nam
 write.table(recurrence_know_gtf_data,'hs_recurrence_know_gtf_data.txt',quote = F,col.names = F,row.names = F)
 write.table(unrecurrence_know_gtf_data,'hs_unrecurrence_know_gtf_data.txt',quote = F,col.names = F,row.names = F)
 
-
 write.table(normal_novel_gtf_data,'hs_normal_novel_gtf_data.txt',quote = F,col.names = F,row.names = F)
 write.table(recurrence_novel_gtf_data,'hs_recurrence_novel_gtf_data.txt',quote = F,col.names = F,row.names = F)
 write.table(unrecurrence_novel_gtf_data,'hs_unrecurrence_novel_gtf_data.txt',quote = F,col.names = F,row.names = F)
+
+
+
+
+
 
