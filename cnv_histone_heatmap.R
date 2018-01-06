@@ -3,11 +3,11 @@ setwd('D:\\CRC_lncRNA\\cnv\\percentCNV')
 
 ############################
 #全部lncRNA
-all_novel=read.table('lncRNA.final.v2.novel.geneid.txt')
+all_novel=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\lncRNA.final.v2.novel.geneid.txt')
 all_novel=all_novel[,1]
 all_novel_num=length(all_novel)
 
-all_known=read.table('lncRNA.final.v2.known.geneid.txt')
+all_known=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\lncRNA.final.v2.known.geneid.txt')
 all_known=all_known[,1]
 all_known_num=length(all_known)
 
@@ -65,6 +65,13 @@ for (k in 1:length(intersect_normal_cnv)){
 nearcoding=unique(nearcoding)
 write.table(nearcoding,'D:\\CRC_lncRNA\\cnv\\percentCNV\\nearcoding.txt',quote=F,col.names = F,row.names = F)
 
+
+normal_intersect_down=read.table('D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_DESeq2_edgeR_intersect_down.txt',sep='\t')
+normal_intersect_up=read.table('D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_DESeq2_edgeR_intersect_up.txt',sep='\t')
+normal_intersect_up=normal_intersect_up[,1]
+normal_intersect_down=normal_intersect_down[,1]
+
+
 #肿瘤vs正常的且有cnv
 intersect_normal_cnv_up=intersect(intersect_normal_cnv,normal_intersect_up)
 intersect_normal_cnv_down=intersect(intersect_normal_cnv,normal_intersect_down)
@@ -72,19 +79,27 @@ intersect_normal_cnv_down=intersect(intersect_normal_cnv,normal_intersect_down)
 intersect_normal_cnv_up_down=c(intersect_normal_cnv_up,intersect_normal_cnv_down)
 #找出差异基因对应的gtf文件为bed文件
 intersect_normal_cnv_up_down=data.frame(lncRNA=intersect_normal_cnv_up_down)
+
 lncRNA_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\only_min_max_position_lncRNA.final.v2.gtf',stringsAsFactors = F)
 colnames(lncRNA_gtf)=c("chr","start","end","lncRNA")
 intersect_normal_cnv_up_down_gtf=merge(intersect_normal_cnv_up_down,lncRNA_gtf,by='lncRNA',sort=F)
 intersect_normal_cnv_up_down_gtf=intersect_normal_cnv_up_down_gtf[,c(2,3,4,1)]
 write.table(intersect_normal_cnv_up_down_gtf,'D:\\CRC_lncRNA\\diffexp\\TF_intersect_normal_cnv_up_down_gtf.bed',quote = F,col.names = F,row.names = F,sep = '\t')
 
+countData_normal_cnv=read.table("D:\\CRC_lncRNA\\diffexp\\data_normal_TF.txt",sep='\t',stringsAsFactors = F)
+
+
+
+############################
+
+
 #获取正常和肿瘤样本与cnv拷贝数交集的logFC值
 intersect_normal_cnv_up_logFC=res_normal[rownames(res_normal)%in%intersect_normal_cnv_up,]
 intersect_normal_cnv_up_logFC=intersect_normal_cnv_up_logFC[order(intersect_normal_cnv_up_logFC[,2],decreasing=T),]
 intersect_normal_cnv_down_logFC=res_normal[rownames(res_normal)%in%intersect_normal_cnv_down,]
 intersect_normal_cnv_down_logFC=intersect_normal_cnv_down_logFC[order(intersect_normal_cnv_down_logFC[,2],decreasing=F),]
-write.table(intersect_normal_cnv_up_logFC,'D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\TF_intersect_normal_cnv_up_logFC.txt',quote = F)
-write.table(intersect_normal_cnv_down_logFC,'D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\TF_intersect_normal_cnv_down_logFC.txt',quote = F)
+write.table(intersect_normal_cnv_up_logFC,'D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\num2_intersect_normal_cnv_up_logFC.txt',quote = F)
+write.table(intersect_normal_cnv_down_logFC,'D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\num2_intersect_normal_cnv_down_logFC.txt',quote = F)
 
 intersect_normal_cnv_up_down_logFC=rbind(intersect_normal_cnv_up_logFC,intersect_normal_cnv_down_logFC)
 
@@ -110,11 +125,14 @@ pheatmap(intersect_normal_rec_cnv_up_down_logFC,cluster_cols = F,cluster_rows =F
          colorRampPalette(c("green", "black", "red"))(50),show_rownames=F,show_colnames=F)
 
 
+
+
+
 #正常和肿瘤、复发和未复发间差异lncRNA和有拷贝数变异CNV的lncRNA的三种交集
 venn.diagram(list(normal_differentlncRNA=normal_DESeq_edgR_intersect,rec_differentlncRNA=rec_DESeq_edgR_intersect,CNVlncRNA=union_per_novel_known_gene),cat.cex=c(1,1,1),lwd=c(1,1,1),cex=2,fill=c("red","blue","yellow"),"D:\\CRC_lncRNA\\cnv\\TF_normal_rec_ornot_CNV_intersectgene.pdf")
 lncRNA_CNV2=intersect(normal_DESeq_edgR_intersect,rec_DESeq_edgR_intersect)
 lncRNA_CNV=intersect(lncRNA_CNV2,union_per_novel_known_gene)
-write.table(lncRNA_CNV,'D:\\CRC_lncRNA\\cnv\\percentCNV\\TF_normal_rec_0.25CNV_lncRNA.txt',quote = F,col.names = F,row.names = F)
+write.table(lncRNA_CNV,'D:\\CRC_lncRNA\\cnv\\percentCNV\\num2_normal_rec_0.25CNV_lncRNA.txt',quote = F,col.names = F,row.names = F)
 
 
 #肿瘤相对于正常
@@ -141,23 +159,29 @@ write.table(intersect_rec_dflncRNA_CNV_up_down_data,'intersect_rec_dflncRNA_CNV_
 
 #heatmap
 upregulateMatrix=intersect_normal_dflncRNA_CNV_up_down_data
-sampleInfo=data.frame(colnames(normal_intersect_data),Subset=group_list_normal)
+sampleInfo=data.frame(colnames(intersect_normal_dflncRNA_CNV_up_down_data),Subset=group_list_normal)
 colnum=2
+pdf("D:\\CRC_lncRNA\\cnv\\percentCNV\\intersect_normal_dflncRNA_CNV.pdf")
 source('D:\\R\\heatmap.R')
+dev.off()
+
 
 upregulateMatrix=intersect_rec_dflncRNA_CNV_up_down_data
-sampleInfo=data.frame(colnames(normal_intersect_data),Subset=group_list_rec)
+sampleInfo=data.frame(colnames(intersect_rec_dflncRNA_CNV_up_down_data),Subset=group_list_rec)
 colnum=2
+pdf("D:\\CRC_lncRNA\\cnv\\percentCNV\\intersect_rec_dflncRNA_CNV.pdf")
 source('D:\\R\\heatmap.R')
+dev.off()
+
 
 #############
 #上下调基因和cnv 的Amp和Del，卡方检验
 setwd('D:\\CRC_lncRNA\\cnv\\percentCNV')
-res_up_normal=read.table("D:\\CRC_lncRNA\\diffexp\\tumor_vs_normalType_tumor_vs_normal_lfc_1_pval_0.05.deseq.up_regulate.xls",sep='\t')
-res_down_normal=read.table("D:\\CRC_lncRNA\\diffexp\\tumor_vs_normalType_tumor_vs_normal_lfc_1_pval_0.05.deseq.down_regulate.xls",sep='\t')
+res_up_normal=read.table("D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_lfc_1_pval_0.05.deseq.up_regulate.xls",sep='\t')
+res_down_normal=read.table("D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_lfc_1_pval_0.05.deseq.down_regulate.xls",sep='\t')
 
-diff_gene_edgeR_up_normal=read.csv( "D:\\CRC_lncRNA\\diffexp\\up_PValue0.05_diff_gene_edgeR_normal_vs_tumor_edgeR.csv",header=T,row.names = 1)
-diff_gene_edgeR_down_normal=read.csv( "D:\\CRC_lncRNA\\diffexp\\down_PValue0.05_diff_gene_edgeR_normal_vs_tumor_edgeR.csv",header=T,row.names = 1)
+diff_gene_edgeR_up_normal=read.csv( "D:\\CRC_lncRNA\\diffexp\\up_PValue0.05_diff_gene_edgeR_tumor_vs_normal_edgeR.csv",header=T,row.names = 1)
+diff_gene_edgeR_down_normal=read.csv( "D:\\CRC_lncRNA\\diffexp\\down_PValue0.05_diff_gene_edgeR_tumor_vs_normal_edgeR.csv",header=T,row.names = 1)
 
 normal_intersect_up=intersect(rownames(res_up_normal),rownames(diff_gene_edgeR_down_normal)) 
 normal_intersect_down=intersect(rownames(res_down_normal),rownames(diff_gene_edgeR_up_normal))
@@ -328,3 +352,50 @@ sp+theme_bw() + theme(title=element_text(size=15,color="black"
 ),plot.title = element_text(hjust = 0.5),legend.title=element_blank(),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 20, face = "bold"),axis.title.y= element_text(size = 30, face = "bold"),axis.text.x=element_text(size=25,color="black"))
 
 dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+normal_cnv_intersect_up_data=countData_normal_cnv[rownames(countData_normal_cnv)%in%intersect_normal_cnv_up,]
+normal_cnv_intersect_down_data=countData_normal_cnv[rownames(countData_normal_cnv)%in%intersect_normal_cnv_down,]
+normal_cnv_intersect_data=rbind(normal_cnv_intersect_up_data,normal_cnv_intersect_down_data)
+dim(normal_cnv_intersect_up_data)
+dim(normal_cnv_intersect_down_data)
+dim(normal_cnv_intersect_data)
+
+# #画热图
+# #正常和cnv
+# upregulateMatrix=normal_cnv_intersect_data
+# group_list_normal<- factor(c(rep('normal',20),rep('tumor',20)))
+# sampleInfo=data.frame(colnames(normal_cnv_intersect_data),Subset=group_list_normal)
+# colnum=2
+# pdf(file=paste("D:\\CRC_lncRNA\\cnv\\percentCNV\\normal_cnv_heatmap.pdf",sep=''))
+# source('D:\\R\\heatmap.R')
+# dev.off()
+# 
+# 
+# #复发未复发
+# countData_rec=read.table('D:\\CRC_lncRNA\\diffexp\\lncRNA.rsem.count_sort_rec_not_TF.txt',sep='\t',header = T,stringsAsFactors = F)
+# colData=data.frame(sample=colnames(countData_rec),Type=c(rep('recu',10),rep('unrecu',10)))
+# rec_up_gene=read.table('D:\\CRC_lncRNA\\diffexp\\rec_DESeq2_edgeR_intersect_up.txt',sep='\t',stringsAsFactors = F)
+# rec_up_gene=rec_up_gene[,1]
+# rec_down_gene=read.table('D:\\CRC_lncRNA\\diffexp\\rec_DESeq2_edgeR_intersect_down.txt',sep='\t',stringsAsFactors = F)
+# rec_down_gene=rec_down_gene[,1]
+# 
+# 
+# 
+# rec_cnv_intersect_up_data=countData_normal_cnv[rownames(countData_normal_cnv)%in%intersect_normal_cnv_up,]
+# rec_cnv_intersect_down_data=countData_normal_cnv[rownames(countData_normal_cnv)%in%intersect_normal_cnv_down,]
+# rec_cnv_intersect_data=rbind(normal_cnv_intersect_up_data,normal_cnv_intersect_down_data)
+# dim(normal_cnv_intersect_up_data)
+# dim(normal_cnv_intersect_down_data)
+# dim(normal_cnv_intersect_data)

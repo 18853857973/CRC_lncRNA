@@ -81,25 +81,26 @@ def getlncRNAdirection(inputfile,outputfile):
 					fw.write(line2.split('\t')[3]+'\t'+line2.split('\t')[4])
 			
 
-getlncRNAdirection("D:\\CRC_lncRNA\\diffexp\\lncRNA_TF.txt","D:\\CRC_lncRNA\\diffexp\\5151_lncRNA_TF_direc.bed")
+#getlncRNAdirection("D:\\CRC_lncRNA\\diffexp\\lncRNA_TF.txt","D:\\CRC_lncRNA\\diffexp\\5151_lncRNA_TF_direc.bed")
 
 
 
 #先从gtf中筛选出有转录活性的lncRNA
+#在样本间表达量大于等于1个数大于等于2的筛选后
 def gtf_lncRNA_TF(known_novel):
 	#所有有转录活性的lncRNA
 	tflncRNA=[]
-	with open('D:\\CRC_lncRNA\\diffexp\\lncRNA_TF.txt') as TF_lncRNA:
+	with open('D:\\CRC_lncRNA\\diffexp\\lncRNA.rsem.FPKM_sort_morethan1_num_2_genenames.txt') as TF_lncRNA:
 		for line in TF_lncRNA.readlines():
 			tflncRNA.append(line.strip())
 
-	with open ('D:\\CRC_lncRNA\\filter\\lncRNA\\TF_lncRNA.final.v2.'+known_novel+'.gtf','w') as fwknown:
+	with open ('D:\\CRC_lncRNA\\filter\\lncRNA\\num2_lncRNA.final.v2.'+known_novel+'.gtf','w') as fwknown:
 		with open('D:\\CRC_lncRNA\\filter\\lncRNA\\lncRNA.final.v2.'+known_novel+'.gtf') as knowngtf:
 			for line2 in knowngtf.readlines():
 				if line2.split("\"")[1] in tflncRNA:
 					fwknown.write(line2)
-# gtf_lncRNA_TF('known')
-# gtf_lncRNA_TF('novel')
+#gtf_lncRNA_TF('known')
+#gtf_lncRNA_TF('novel')
 
 
 def exon_length(filename,outputfile):
@@ -125,8 +126,8 @@ def exon_length(filename,outputfile):
 				allsum =allsum+int(val[i])
 			fprint.write(k+'\t'+str(allsum)+'\n') 
 
-# exon_length('TF_lncRNA.final.v2.known.gtf','TF_lncRNA.known.length.txt')
-# exon_length('TF_lncRNA.final.v2.novel.gtf','TF_lncRNA.novel.length.txt')
+#exon_length('num2_lncRNA.final.v2.known.gtf','num2_lncRNA.known.length.txt')
+#exon_length('num2_lncRNA.final.v2.novel.gtf','num2_lncRNA.novel.length.txt')
 
 #gtf文件相同的基因合并，取最小最大位点
 def gtf_bind_same_lncRNA():
@@ -155,13 +156,15 @@ def gtf_bind_same_lncRNA():
 			start=min(zd[key])
 			end=max(zd[key])
 			fwgtf.write(zdhs[key]+'\t'+start+'\t'+end+'\t'+key+'\t'+zfl[key]+'\n')
+#gtf_bind_same_lncRNA()
+
 
 
 def getchpositionlog(up_down,rec_normal):
 	hadgene=[]
 	gene=[]
 	gene_log={}
-	with open(rec_normal+'_DESeq2_edgeR_res_intersect_'+up_down+'.txt') as dfgene:
+	with open('D:/CRC_lncRNA/diffexp/'+rec_normal+'_DESeq2_edgeR_res_intersect_'+up_down+'.txt') as dfgene:
 		for line in dfgene.readlines()[1:]:
 			genename=line.split('\t')[0]
 			if (up_down=="down"):
@@ -185,7 +188,7 @@ def getchpositionlog(up_down,rec_normal):
 						fw.write("hs"+ch.strip("chr")+' '+start+' '+end+' '+str(gene_log[gene_id])+'\n')
 						#fw.write("hs"+ch.strip("chr")+' '+str(position)+' '+str(position+1)+' '+str(gene_log[gene_id])+'\n')
 
-# getchpositionlog('up','rec')
-# getchpositionlog('down','rec')
-# getchpositionlog('up','normal')
-# getchpositionlog('down','normal')
+getchpositionlog('up','rec')
+getchpositionlog('down','rec')
+getchpositionlog('up','normal')
+getchpositionlog('down','normal')

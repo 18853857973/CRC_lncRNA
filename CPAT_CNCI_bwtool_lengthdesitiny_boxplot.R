@@ -1,19 +1,29 @@
 setwd('D:\\CRC_lncRNA\\filter\\RSEM_expression')
 #样本按照肿瘤和正常排序
-data=read.table('lncRNA.rsem.FPKM.txt',header = T,stringsAsFactors = F,sep = '\t',check.names = F)
+# data=read.table('lncRNA.rsem.FPKM.txt',header = T,stringsAsFactors = F,sep = '\t',check.names = F)
+# samplename=strsplit(colnames(data),split="_",fixed=T)
+# rown=c()
+# for (n in (1:length(samplename))){
+#   g=samplename[[n]][1]
+#   rown=c(rown,g)
+# }
+# colnames(data)=rown
+# data=data[,sort(rown)]
+# write.table(data,'lncRNA.rsem.FPKM_sort.txt',quote = F,sep='\t')
 
-samplename=strsplit(colnames(data),split="_",fixed=T)
-rown=c()
-for (n in (1:length(samplename))){
-  g=samplename[[n]][1]
-  rown=c(rown,g)
-}
-colnames(data)=rown
-
-data=data[,sort(rown)]
-write.table(data,'lncRNA.rsem.FPKM_sort.txt',quote = F,sep='\t')
-
+#筛选在各个样本中表达大于等于1个数大于等于2的
 data2=read.table('D:\\CRC_lncRNA\\filter\\RSEM_expression\\lncRNA.rsem.FPKM_sort.txt',header = T,stringsAsFactors = F,sep = '\t',check.names = F)
+tof=apply(data2,1,function(x) length(which(x>=1))>=2)
+data4=data2[tof,]
+write.table(data4,'D:\\CRC_lncRNA\\filter\\RSEM_expression\\lncRNA.rsem.FPKM_sort_morethan1_num_2.txt',quote=F,sep='\t')
+
+data2=data4
+
+write.table(row.names(data4),"D:\\CRC_lncRNA\\diffexp\\lncRNA.rsem.FPKM_sort_morethan1_num_2_genenames.txt",quote=F,row.names=F,col.names=F)
+
+
+
+#data2=read.table('D:\\CRC_lncRNA\\filter\\RSEM_expression\\lncRNA.rsem.FPKM_sort_morethan1_num_2.txt',header = T,stringsAsFactors = F,sep = '\t',check.names = F)
 data=matrix(as.numeric(unlist(data2)),ncol=40)
 rowmean_data=data.frame(rowMeans(data[,c(1:10)]),rowMeans(data[,c(11:20)]),rowMeans(data[,c(21:30)]),rowMeans(data[,c(31:40)]))
 colnames(rowmean_data)=c("A","B","C","D")
@@ -26,7 +36,7 @@ colnames(gtf)=c("chr","known","start","end","geneid")
 
 data2=data.frame(rownames(rowmean_data),rowmean_data)
 #筛选出转录活性的lncRNA
-data2=data2[data2[,1]%in%lncRNA_TF,]
+#data2=data2[data2[,1]%in%lncRNA_TF,]
 
 colnames(data2)=c("geneid",colnames(rowmean_data))
 gtf_data=merge(gtf,data2,by="geneid",sort = F)
@@ -140,13 +150,13 @@ dev.off()
 
 #######################################################################################
 #length_desitiny
-
+#exon_length()
 setwd('D:\\CRC_lncRNA\\filter\\lncRNA')
-novel_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\TF_lncRNA.novel.length.txt',sep='\t',stringsAsFactors = F)
+novel_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\num2_lncRNA.novel.length.txt',sep='\t',stringsAsFactors = F)
 novel_length=novel_gtf[,2]
 x=novel_length
 
-known_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\TF_lncRNA.known.length.txt',sep='\t',stringsAsFactors = F)
+known_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\num2_lncRNA.known.length.txt',sep='\t',stringsAsFactors = F)
 known_length=known_gtf[,2]
 x2=known_length
 
@@ -160,7 +170,7 @@ df3=data.frame(length=x3,type='protein-coding gene')
 
 df=rbind(df1,df2,df3)
 
-pdf(file="D:\\CRC_lncRNA\\filter\\lncRNA\\TF_length_desitiny_plot.pdf")
+pdf(file="D:\\CRC_lncRNA\\filter\\lncRNA\\num2_length_desitiny_plot.pdf")
 
 sp=ggplot(df,aes(x = length, fill= type,colour = type)) +geom_density()+xlim(limits = c(-1000, 90000))+labs(x="",y = " ")
 sp+theme_bw() + theme(legend.title=element_blank(),legend.position=c(0.8,0.8),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 15, face = "bold"),axis.title.y= element_text(size = 15, face = "bold"))
@@ -183,12 +193,12 @@ pc_lnc5=log2(pc_lnc3+0.01)
 lnc=pc_lnc5[1:35169,]
 pc=pc_lnc5[-c(1:35169),]
 
-known_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\TF_lncRNA.final.v2.known.gtf',stringsAsFactors = F,sep='"')
+known_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\num2_lncRNA.final.v2.known.gtf',stringsAsFactors = F,sep='"')
 known_gene_id=known_gtf[,2]
 known_gene_id=unique(known_gene_id)
 know_data=lnc[rownames(lnc)%in%known_gene_id,]
 
-novel_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\TF_lncRNA.final.v2.novel.gtf',stringsAsFactors = F,sep='"')
+novel_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\num2_lncRNA.final.v2.novel.gtf',stringsAsFactors = F,sep='"')
 novel_gene_id=novel_gtf[,2]
 novel_gene_id=unique(novel_gene_id)
 novel_data=lnc[rownames(lnc)%in%novel_gene_id,]
@@ -228,7 +238,7 @@ df3=data.frame(df3,flag='norec')
 
 df=rbind(df1,df2,df3)
 
-pdf(file="D:\\CRC_lncRNA\\filter\\RSEM_expression\\TF_three_RNA_expression_boxplot.pdf")
+pdf(file="D:\\CRC_lncRNA\\filter\\RSEM_expression\\num2_three_RNA_expression_boxplot.pdf")
 sp=ggplot(df)+geom_boxplot(aes(x=flag,y=num,fill=RNA))+labs(x="",y = "")+guides(fill=guide_legend(title="Legend_Title"))+ ylim(limits = c(-8, 25))
 sp+theme_bw() + theme(legend.title=element_blank(),legend.position=c(0.16,0.9),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 15, face = "bold"),axis.title.y= element_text(size = 15, face = "bold"))
 dev.off()

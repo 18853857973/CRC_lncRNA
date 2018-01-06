@@ -67,28 +67,13 @@ bedtools intersect -a exp_more_than2_lncRNA.bed -b /disk/zhw/CRClncRNA/chipseq/S
 #集群
 #转为三列bed
 cd /disk/zhw/CRClncRNA/filter/lncRNA
-cat TF_lncRNA.final.v2.known.gtf|awk '{print $1,$4,$5}'|sort -u |sed 's/ /\t/g'>lncRNA.final.v2.known2.bed
-cat TF_lncRNA.final.v2.novel.gtf|awk '{print $1,$4,$5}'|sort -u |sed 's/ /\t/g'>lncRNA.final.v2.novel2.bed
+cat num2_lncRNA.final.v2.known.gtf|awk '{print $1,$4,$5}'|sort -u |sed 's/ /\t/g'>lncRNA.final.v2.known2.bed
+cat num2_lncRNA.final.v2.novel.gtf|awk '{print $1,$4,$5}'|sort -u |sed 's/ /\t/g'>lncRNA.final.v2.novel2.bed
 cat protein_coding.final.gtf|awk '{print $1,$4,$5}'|sort -u |sed 's/ /\t/g'>protein_coding.final2.bed
 
+#cat TF_lncRNA.final.v2.known.gtf|awk '{print $1,$4,$5}'|sort -u |sed 's/ /\t/g'>lncRNA.final.v2.known2.bed
+#cat TF_lncRNA.final.v2.novel.gtf|awk '{print $1,$4,$5}'|sort -u |sed 's/ /\t/g'>lncRNA.final.v2.novel2.bed
 
-#novel
-cd /data2/zhw/CRC_lncRNA
-less lncRNA.final.v2.novel2.bed | perl -wanle'$b++;$a=$F[2]-$F[1];print $_ unless $a==0' >lncRNA.final.v2.novel3.bed
-#/data/software/bwtool-master/bwtool extract bed lncRNA.final.v2.novel3.bed /data/database/hg38/hg38.phastCons100way.bw novel_bwtools
-/disk/soft/bwtool/bwtool extract bed lncRNA.final.v2.novel3.bed /disk/database/human/hg38/hg38.phastCons100way.bw novel_bwtools
-less -S novel_bwtools| perl -wanle'my @G=split /,/,$F[4];my $a=0;my $b=0;for(@G){next if /NA/;$a+=$_;$b++}if($b==0){$c="NA"}else{$c=$a/$b}print join "\t", @F[0..3], $c' >novel.mean.txt
-
-#known
-less lncRNA.final.v2.known2.bed | perl -wanle'$b++;$a=$F[2]-$F[1];print $_ unless $a==0' >lncRNA.final.v2.known3.bed
-#/data/software/bwtool-master/bwtool extract bed lncRNA.final.v2.known3.bed /data/database/hg38/hg38.phastCons100way.bw known_bwtools
-/disk/soft/bwtool/bwtool extract bed lncRNA.final.v2.known3.bed /disk/database/human/hg38/hg38.phastCons100way.bw known_bwtools
-less -S known_bwtools| perl -wanle'my @G=split /,/,$F[4];my $a=0;my $b=0;for(@G){next if /NA/;$a+=$_;$b++}if($b==0){$c="NA"}else{$c=$a/$b}print join "\t", @F[0..3], $c' >knonw.mean.txt
-
-#protein
-less protein_coding.final2.bed | perl -wanle'$b++;$a=$F[2]-$F[1];print $_ unless $a==0' >protein_coding.final3.bed
-/data/software/bwtool-master/bwtool extract bed protein_coding.final3.bed /data/database/hg38/hg38.phastCons100way.bw protein_bwtools
-less -S protein_bwtools| perl -wanle'my @G=split /,/,$F[4];my $a=0;my $b=0;for(@G){next if /NA/;$a+=$_;$b++}if($b==0){$c="NA"}else{$c=$a/$b}print join "\t", @F[0..3], $c' >protein.mean.txt
 
 
 #合并（集群）
@@ -106,22 +91,11 @@ cd /disk/zhw/CRClncRNA/filter/lncRNA
 cat lncRNA.final.v2.gtf|awk '{print $1,$2,$4,$5,$10}'|sed 's/"//g'|sed 's/;//g'|sed 's/ /\t/g' >lncRNA.final.v2.cp.2.txt
 
 
-
 #画circos图
 #分类
 #运行coding_potential_ecdf.R
 #node1 root
-
-#test
-head -1000 hs_exp_data/hs_normal_know_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_normal_know_gtf_data3.txt
-head -1000 hs_exp_data/hs_normal_novel_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_normal_novel_gtf_data3.txt
-head -1000 hs_exp_data/hs_unrecurrence_know_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_unrecurrence_know_gtf_data3.txt
-head -1000 hs_exp_data/hs_unrecurrence_novel_gtf_data.txt | awk {'print $1,$2,$3,$4'}>hs_unrecurrence_novel_gtf_data3.txt
-head -1000 hs_exp_data/hs_recurrence_novel_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_recurrence_novel_gtf_data3.txt
-head -1000 hs_exp_data/hs_recurrence_know_gtf_data.txt| awk {'print $1,$2,$3,$4'}>hs_recurrence_know_gtf_data3.txt
-
-/disk/soft/circos-0.69-6/bin/circos -conf circoshhj_test.conf
-
+cd /disk/zhw/CRClncRNA/circos
 /disk/soft/circos-0.69-6/bin/circos -conf circoshhj.conf
 
 #有转录活性的基因D:\CRC_lncRNA\diffexp\lncRNA_TF.txt
@@ -131,14 +105,18 @@ head -1000 hs_exp_data/hs_recurrence_know_gtf_data.txt| awk {'print $1,$2,$3,$4'
 #把gtf转为fa文件
 cd /disk/zhw/CRClncRNA/filter/lncRNA
 
-dos2unix TF_lncRNA.final.v2.novel.gtf
-dos2unix TF_lncRNA.final.v2.known.gtf
+#dos2unix TF_lncRNA.final.v2.novel.gtf
+#dos2unix TF_lncRNA.final.v2.known.gtf
+dos2unix num2_lncRNA.final.v2.novel.gtf
+dos2unix num2_lncRNA.final.v2.known.gtf
+
 
 gffread TF_lncRNA.final.v2.known.gtf -o-|gffread -  -g /disk/database/human/hg38/Gencode/genome.fa -w lncRNA.final.v2.known.fa -W
 gffread TF_lncRNA.final.v2.novel.gtf -o-|gffread -  -g /disk/database/human/hg38/Gencode/genome.fa -w lncRNA.final.v2.novel.fa -W
 gffread protein_coding.final.gtf  -o-|gffread -  -g /disk/database/human/hg38/Gencode/genome.fa -w protein_coding.final.fa -W
 
 #CPAT#集群节点2
+ssh node2
 cd /disk/zhw/CRClncRNA/CPAT
 /disk/soft/CPAT-1.2.3/bin/cpat.py -g /disk/zhw/CRClncRNA/filter/lncRNA/protein_coding.final.fa -d Human_logitModel.RData -x Human_Hexamer.tsv -o CPAT_protein_coding.final
 /disk/soft/CPAT-1.2.3/bin/cpat.py -g /disk/zhw/CRClncRNA/filter/lncRNA/lncRNA.final.v2.novel.fa -d Human_logitModel.RData -x Human_Hexamer.tsv -o CPAT_lncRNA.final.v2.novel
@@ -180,8 +158,8 @@ cat lncRNA.final.v2.gtf |awk '{print $10}'|sed 's/"//g'|sed 's/;//g'|sed 's/ /\t
 
 #转为bed文件
 cd /disk/zhw/CRClncRNA/filter/lncRNA
-/disk/soft/bedops/gtf2bed < TF_lncRNA.final.v2.known.gtf|sort-bed - > lncRNA.final.v2.known.bed
-/disk/soft/bedops/gtf2bed < TF_lncRNA.final.v2.novel.gtf|sort-bed - > lncRNA.final.v2.novel.bed
+/disk/soft/bedops/gtf2bed < num2_lncRNA.final.v2.known.gtf|sort-bed - > lncRNA.final.v2.known.bed
+/disk/soft/bedops/gtf2bed < num2_lncRNA.final.v2.novel.gtf|sort-bed - > lncRNA.final.v2.novel.bed
 
 sort -k 1V,1 -k 2n,2 lncRNA.final.v2.novel.bed >lncRNA.final.v2.novel.sorted.bed
 sort -k 1V,1 -k 2n,2 lncRNA.final.v2.known.bed >lncRNA.final.v2.known.sorted.bed
@@ -218,6 +196,9 @@ cat rec_DESeq2_edgeR_up_gene_for_circos.txt |sort -k 1V,1 -k 2n,2 |uniq >uniq_re
 cat rec_DESeq2_edgeR_down_gene_for_circos.txt |sort -k 1V,1 -k 2n,2 |uniq >uniq_rec_DESeq2_edgeR_down_gene_for_circos.txt
 cat normal_DESeq2_edgeR_up_gene_for_circos.txt |sort -k 1V,1 -k 2n,2 |uniq >uniq_normal_DESeq2_edgeR_up_gene_for_circos.txt
 cat normal_DESeq2_edgeR_down_gene_for_circos.txt |sort -k 1V,1 -k 2n,2 |uniq >uniq_normal_DESeq2_edgeR_down_gene_for_circos.txt
+
+cat normal_DESeq2_edgeR_up_gene_for_circos.txt | awk {'print $1,$2,$3,-$4'}>uniq_normal_DESeq2_edgeR_up_gene_for_circos.txt
+cat normal_DESeq2_edgeR_down_gene_for_circos.txt | awk {'print $1,$2,$3,-$4'}>uniq_normal_DESeq2_edgeR_down_gene_for_circos.txt
 
 #绘制cnv circos图
 cd /disk/zhw/CRClncRNA/cnv/circos
@@ -340,8 +321,6 @@ cat UCEC.res_novel_known.Del.geneid_precent_sorted.gistic | awk '{print $1"\t"$2
 
 
 
-
-
 #python获取到没有比对部分，合并两个文件#获取到有cnv的 取到没有CNV变异的复制为0 合并 #排序
 #cd /disk/zhw/CRClncRNA/cnv/heatmap
 #perl uniq_mean.pl ../rep_all_novel.Amp.geneid_precent.gistic >rep_all_novel.Amp.geneid_precent_gene_num.gistic
@@ -364,5 +343,22 @@ cat UCEC.res_novel_known.Del.geneid_precent_sorted.gistic | awk '{print $1"\t"$2
 
 
 
+#novel
+cd /data2/zhw/CRC_lncRNA
+less lncRNA.final.v2.novel2.bed | perl -wanle'$b++;$a=$F[2]-$F[1];print $_ unless $a==0' >lncRNA.final.v2.novel3.bed
+#/data/software/bwtool-master/bwtool extract bed lncRNA.final.v2.novel3.bed /data/database/hg38/hg38.phastCons100way.bw novel_bwtools
+/disk/soft/bwtool/bwtool extract bed lncRNA.final.v2.novel3.bed /disk/database/human/hg38/hg38.phastCons100way.bw novel_bwtools
+less -S novel_bwtools| perl -wanle'my @G=split /,/,$F[4];my $a=0;my $b=0;for(@G){next if /NA/;$a+=$_;$b++}if($b==0){$c="NA"}else{$c=$a/$b}print join "\t", @F[0..3], $c' >novel.mean.txt
+
+#known
+less lncRNA.final.v2.known2.bed | perl -wanle'$b++;$a=$F[2]-$F[1];print $_ unless $a==0' >lncRNA.final.v2.known3.bed
+#/data/software/bwtool-master/bwtool extract bed lncRNA.final.v2.known3.bed /data/database/hg38/hg38.phastCons100way.bw known_bwtools
+/disk/soft/bwtool/bwtool extract bed lncRNA.final.v2.known3.bed /disk/database/human/hg38/hg38.phastCons100way.bw known_bwtools
+less -S known_bwtools| perl -wanle'my @G=split /,/,$F[4];my $a=0;my $b=0;for(@G){next if /NA/;$a+=$_;$b++}if($b==0){$c="NA"}else{$c=$a/$b}print join "\t", @F[0..3], $c' >knonw.mean.txt
+
+#protein
+less protein_coding.final2.bed | perl -wanle'$b++;$a=$F[2]-$F[1];print $_ unless $a==0' >protein_coding.final3.bed
+/data/software/bwtool-master/bwtool extract bed protein_coding.final3.bed /data/database/hg38/hg38.phastCons100way.bw protein_bwtools
+less -S protein_bwtools| perl -wanle'my @G=split /,/,$F[4];my $a=0;my $b=0;for(@G){next if /NA/;$a+=$_;$b++}if($b==0){$c="NA"}else{$c=$a/$b}print join "\t", @F[0..3], $c' >protein.mean.txt
 
 

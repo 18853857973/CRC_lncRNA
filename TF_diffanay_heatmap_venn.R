@@ -8,17 +8,36 @@ library(ggplot2)
 library(ggpubr)
 library(ggsignif)
 
+#区分肿瘤和复发
+countData_all=read.table('D:\\CRC_lncRNA\\filter\\RSEM_expression\\lncRNA.rsem.FPKM_sort.txt',sep='\t',header = T,stringsAsFactors = F)
+countData_num2=countData_all[row.names(countData_all)%in%row.names(data4),]
+
+countData_normal=countData_num2[,c(1:10,31:40,11:30)]
+countData_normal2=matrix(as.integer(unlist(countData_normal)),ncol=40)
+row.names(countData_normal2)=row.names(countData_normal)
+colnames(countData_normal2)=colnames(countData_normal)
+countData_normal=countData_normal2
+write.table(countData_normal,'D:\\CRC_lncRNA\\TF_data\\countData_normal_num2.txt',sep='\t',quote= F)
+
+
+countData_rec=countData_num2[,c(11:30)]
+countData_rec2=matrix(as.integer(unlist(countData_rec)),ncol=20)
+row.names(countData_rec2)=row.names(countData_rec)
+colnames(countData_rec2)=colnames(countData_rec)
+countData_rec=countData_rec2
+write.table(countData_rec,'D:\\CRC_lncRNA\\TF_data\\countData_rec_num2.txt',sep='\t',quote= F)
+
 
 #肿瘤的vs正常的：上调和下调
 
-countData_normal=read.table('data_normal.txt',sep='\t',header = T,stringsAsFactors = F)
+countData_normal=read.table('D:\\CRC_lncRNA\\TF_data\\countData_normal_num2.txt',sep='\t',header = T,stringsAsFactors = F)
 colData_nomal=data.frame(sample=colnames(countData_normal),Type=c(rep('normal',20),rep('tumor',20)))
 colData=colData_nomal
 countData_normal[is.na(countData_normal)] <- 0
-keep <- rowSums(countData_normal>0) >= 0 #a Count>0 in at least 3 samples
 countData_normal <- countData_normal[keep,]
-type_level <- levels(colData$Type)
 comb <- combn(type_level,2)
+
+
 dds <- DESeqDataSetFromMatrix(countData = countData_normal,
                               colData = colData,
                               design = ~ Type)
@@ -75,9 +94,8 @@ write.table(normal_intersect_up,'D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_DESeq2
 normal_intersect_DESeq2_edgeR_up_data=res_normal[rownames(res_normal)%in%normal_intersect_up,]
 normal_intersect_DESeq2_edgeR_down_data=res_normal[rownames(res_normal)%in%normal_intersect_down,]
 
-write.table(normal_intersect_DESeq2_edgeR_up_data,'D:\\CRC_lncRNA\\diffexp\\df_tumor_vs_normal_DESeq2_edgeR_res_intersect_up.txt',sep='\t',quote = F)
-write.table(normal_intersect_DESeq2_edgeR_down_data,'D:\\CRC_lncRNA\\diffexp\\df_tumor_vs_normal_DESeq2_edgeR_res_intersect_down.txt',sep='\t',quote = F)
-
+write.table(normal_intersect_DESeq2_edgeR_up_data,'D:\\CRC_lncRNA\\diffexp\\normal_DESeq2_edgeR_res_intersect_up.txt',sep='\t',quote = F)
+write.table(normal_intersect_DESeq2_edgeR_down_data,'D:\\CRC_lncRNA\\diffexp\\normal_DESeq2_edgeR_res_intersect_down.txt',sep='\t',quote = F)
 
 normal_intersect_up_data=countData_normal[rownames(countData_normal)%in%normal_intersect_up,]
 normal_intersect_down_data=countData_normal[rownames(countData_normal)%in%normal_intersect_down,]
@@ -105,10 +123,10 @@ source('D:\\R\\heatmap.R')
 dev.off()
 
 ## 柱状图
-novel_lncRNA=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\novel_geneid.txt',sep='\t',stringsAsFactors = F)
+novel_lncRNA=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\lncRNA.final.v2.novel.geneid.txt',sep='\t',stringsAsFactors = F)
 novel_lncRNA_genesymbol=novel_lncRNA[,1]
 
-known_lncRNA=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\known_geneid.txt',sep='\t',stringsAsFactors = F)
+known_lncRNA=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\lncRNA.final.v2.known.geneid.txt',sep='\t',stringsAsFactors = F)
 known_lncRNA_genesymbol=known_lncRNA[,1]
 
 normal_df_gene=rownames(normal_intersect_data) #3785
@@ -149,12 +167,9 @@ dat <- data.frame(Group = c("known", "known", "novel", "novel"),
                   Value = c(normal_known,no_df_known,normal_novel,no_df_novel))  
 
 
-
 # ggplot(dat, aes(Group, Value)) +
 #   geom_bar(aes(fill = Sub), stat="identity", position="fill", width=.5) +geom_signif(y_position=1,comparisons = list(c("known", "novel")), 
 #                                                                                      map_signif_level=TRUE)
-
-
 
 dev.off()
 
@@ -212,8 +227,6 @@ sp=ggplot(normal_rec_bar_df,aes(normal,fill=factor(normal_val))) + geom_bar(posi
 sp+theme_bw() + theme(title=element_text(size=15,color="black"
 ),plot.title = element_text(hjust = 0.5),legend.title=element_blank(),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 20, face = "bold"),axis.title.y= element_text(size = 30, face = "bold"),axis.text.x=element_text(size=25,color="black"))
 dev.off()
-
-
 
 
 #################################
