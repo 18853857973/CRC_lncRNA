@@ -90,6 +90,9 @@ normal_intersect_up_down=union(normal_intersect_up,normal_intersect_down)
 
 write.table(normal_intersect_down,'D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_DESeq2_edgeR_intersect_down.txt',sep='\t',col.names = F,row.names = F,quote = F)
 write.table(normal_intersect_up,'D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_DESeq2_edgeR_intersect_up.txt',sep='\t',col.names = F,row.names = F,quote = F)
+write.table(normal_intersect_up_down,'D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_DESeq2_edgeR_intersect_up_down.txt',sep='\t',col.names = F,row.names = F,quote = F)
+
+
 
 normal_intersect_DESeq2_edgeR_up_data=res_normal[rownames(res_normal)%in%normal_intersect_up,]
 normal_intersect_DESeq2_edgeR_down_data=res_normal[rownames(res_normal)%in%normal_intersect_down,]

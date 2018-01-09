@@ -27,7 +27,7 @@ type=c(rep("novel",all_novel_num),rep("known",all_known_num))
 num=c(rep("CNV",per_novel_num),rep("NON_CNV",novel_less),rep("CNV",per_known_num),rep("NON_CNV",known_less))
 per_df=data.frame(type=type,num=num)
 
-pdf(file='D:\\CRC_lncRNA\\cnv\\percentCNV\\TF_lncRNA_CNV_percent_bar.pdf')
+pdf(file='D:\\CRC_lncRNA\\cnv\\percentCNV\\num2_lncRNA_CNV_percent_bar.pdf')
 sp=ggplot(per_df,aes(type,fill=factor(num))) + geom_bar(position='fill',width=0.5)+labs(x="",y="percent")+ggtitle("CNV_percent_in_novel_known")
 sp+theme_bw() + theme(title=element_text(size=15,color="black"
 ),plot.title = element_text(hjust = 0.5),legend.title=element_blank(),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 20, face = "bold"),axis.title.y= element_text(size = 30, face = "bold"),axis.text.x=element_text(size=25,color="black"))
@@ -84,14 +84,11 @@ lncRNA_gtf=read.table('D:\\CRC_lncRNA\\filter\\lncRNA\\only_min_max_position_lnc
 colnames(lncRNA_gtf)=c("chr","start","end","lncRNA")
 intersect_normal_cnv_up_down_gtf=merge(intersect_normal_cnv_up_down,lncRNA_gtf,by='lncRNA',sort=F)
 intersect_normal_cnv_up_down_gtf=intersect_normal_cnv_up_down_gtf[,c(2,3,4,1)]
-write.table(intersect_normal_cnv_up_down_gtf,'D:\\CRC_lncRNA\\diffexp\\TF_intersect_normal_cnv_up_down_gtf.bed',quote = F,col.names = F,row.names = F,sep = '\t')
+write.table(intersect_normal_cnv_up_down_gtf,'D:\\CRC_lncRNA\\diffexp\\num2_intersect_normal_cnv_up_down_gtf.bed',quote = F,col.names = F,row.names = F,sep = '\t')
 
-countData_normal_cnv=read.table("D:\\CRC_lncRNA\\diffexp\\data_normal_TF.txt",sep='\t',stringsAsFactors = F)
-
-
+countData_normal_cnv=read.table("D:\\CRC_lncRNA\\diffexp\\data_normal_num2.txt",sep='\t',stringsAsFactors = F)
 
 ############################
-
 
 #获取正常和肿瘤样本与cnv拷贝数交集的logFC值
 intersect_normal_cnv_up_logFC=res_normal[rownames(res_normal)%in%intersect_normal_cnv_up,]
@@ -133,6 +130,21 @@ venn.diagram(list(normal_differentlncRNA=normal_DESeq_edgR_intersect,rec_differe
 lncRNA_CNV2=intersect(normal_DESeq_edgR_intersect,rec_DESeq_edgR_intersect)
 lncRNA_CNV=intersect(lncRNA_CNV2,union_per_novel_known_gene)
 write.table(lncRNA_CNV,'D:\\CRC_lncRNA\\cnv\\percentCNV\\num2_normal_rec_0.25CNV_lncRNA.txt',quote = F,col.names = F,row.names = F)
+
+lncRNA_CNV_nearcoding=c()
+L=strsplit(lncRNA_CNV, "-")
+for (k in 1:length(lncRNA_CNV)){
+  if (L[[k]][1]=="LINC"){
+    lncRNA_CNV_nearcoding=c(lncRNA_CNV_nearcoding,L[[k]][2])
+  }else{
+    lncRNA_CNV_nearcoding=c(lncRNA_CNV_nearcoding,L[[k]][1])
+  }
+}
+lncRNA_CNV_nearcoding=unique(lncRNA_CNV_nearcoding)
+write.table(lncRNA_CNV_nearcoding,'D:\\CRC_lncRNA\\cnv\\percentCNV\\num2_normal_rec_0.25CNV_lncRNA_nearcoding.txt',quote=F,col.names = F,row.names = F)
+
+
+
 
 
 #肿瘤相对于正常

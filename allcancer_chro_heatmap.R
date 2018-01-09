@@ -30,18 +30,20 @@ for (can in cancername){
 
 all_cancer_amp_del2=all_cancer_amp_del
 
-all_cancer_amp_del_up=all_cancer_amp_del2[1:365,]
-all_cancer_amp_del_down=all_cancer_amp_del2[366:nrow(all_cancer_amp_del2),]
+all_cancer_amp_del_up=all_cancer_amp_del2[1:684,]
+all_cancer_amp_del_down=all_cancer_amp_del2[685:nrow(all_cancer_amp_del2),]
 all_cancer_amp_del_up_sorted=all_cancer_amp_del_up[order(all_cancer_amp_del_up[,2],decreasing = T),]
 all_cancer_amp_del_down_sorted=all_cancer_amp_del_down[order(all_cancer_amp_del_down[,3],decreasing = F),]
 all_cancer_amp_del_up_down_sorted=rbind(all_cancer_amp_del_up_sorted,all_cancer_amp_del_down_sorted)
 #all_cancer_amp_del3=merge(intersect_normal_cnv_up_down,all_cancer_amp_del2,by.x='lncRNA',by.y='gene',sort=F)
 dim(all_cancer_amp_del_up_down_sorted)
 
-pdf(paste("D:\\CRC_lncRNA\\cnv\\percentCNV\\",known_novel,"_heatmapinallcancer13.pdf",sep=''),width = 2000, height = 1500)
-png(paste("D:\\CRC_lncRNA\\cnv\\percentCNV\\",known_novel,"_heatmapinallcancer13.png",sep=''),width = 2000, height = 1500)
 all_cancer_data=all_cancer_amp_del_up_down_sorted[,-1]
-pheatmap(all_cancer_data,gaps_row=366,cluster_cols = F,cluster_rows =F,show_rownames = F,
+pdf(paste("D:\\CRC_lncRNA\\cnv\\percentCNV\\",known_novel,"_heatmapinallcancer13.pdf",sep=''))
+png(paste("D:\\CRC_lncRNA\\cnv\\percentCNV\\",known_novel,"_heatmapinallcancer13.png",sep=''),width = 2000, height = 1500)
+library(pheatmap)
+save(all_cancer_data,file='D:\\CRC_lncRNA\\cnv\\percentCNV\\all_cancer_data.Rdata')
+pheatmap(all_cancer_data,gaps_row=685,cluster_cols = F,cluster_rows =F,show_rownames = F,
          color = colorRampPalette(c("navy", "white", "firebrick3"))(100))
 
 dev.off()

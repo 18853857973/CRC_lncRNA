@@ -188,7 +188,50 @@ def getchpositionlog(up_down,rec_normal):
 						fw.write("hs"+ch.strip("chr")+' '+start+' '+end+' '+str(gene_log[gene_id])+'\n')
 						#fw.write("hs"+ch.strip("chr")+' '+str(position)+' '+str(position+1)+' '+str(gene_log[gene_id])+'\n')
 
-getchpositionlog('up','rec')
-getchpositionlog('down','rec')
-getchpositionlog('up','normal')
-getchpositionlog('down','normal')
+# getchpositionlog('up','rec')
+# getchpositionlog('down','rec')
+# getchpositionlog('up','normal')
+# getchpositionlog('down','normal')
+
+
+def dfgene_location():
+	alldfgene=[]
+	with open('D:\\CRC_lncRNA\\diffexp\\tumor_vs_normal_DESeq2_edgeR_intersect_up_down.txt') as dfgene:
+		for line in dfgene.readlines():
+			genename=line.split('\n')[0]
+			alldfgene.append(genename)
+			#print (genename)
+
+	up_alldfgene=alldfgene[0:685]
+	down_alldfgene=alldfgene[685:len(alldfgene)]
+
+	with open("D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\intersect_normal_cnv_up_down_gtf.bed","w") as  fw:
+		with open('D:\\CRC_lncRNA\\filter\\lncRNA\\only_min_max_position_lncRNA.final.v2.gtf') as gtf:
+				for line2 in gtf.readlines():
+					gene_id=line2.split("\t")[3].strip("\n")
+					if gene_id in up_alldfgene:
+						fw.write(line2)
+
+	with open("D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\intersect_normal_cnv_up_down_gtf.bed","a") as  fw:
+		with open('D:\\CRC_lncRNA\\filter\\lncRNA\\only_min_max_position_lncRNA.final.v2.gtf') as gtf:
+				for line2 in gtf.readlines():
+					gene_id=line2.split("\t")[3].strip("\n")
+					if gene_id in down_alldfgene:
+						fw.write(line2)
+
+#dfgene_location()
+
+
+def getlncRNA_position():
+	lncRNA=[]
+	with open("D:\\CRC_lncRNA\\cnv\\percentCNV\\num2_normal_rec_0.25CNV_lncRNA.txt")as  f:
+		for l in f.readlines():
+			lncRNA.append(l.strip("\n"))
+	with open("D:\CRC_lncRNA\TCGA_survive\surive_cnv\\num2_normal_rec_0.25CNV_lncRNA.bed","w") as  fw:
+		with open('D:\\CRC_lncRNA\\filter\\lncRNA\\only_min_max_position_lncRNA.final.v2.gtf') as gtf:
+				for line2 in gtf.readlines():
+					gene_id=line2.split("\t")[3].strip("\n")
+					if gene_id in lncRNA:
+						fw.write(line2)
+
+getlncRNA_position()
