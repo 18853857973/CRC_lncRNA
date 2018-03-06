@@ -186,6 +186,87 @@ source('D:\\R\\heatmap.R')
 dev.off()
 
 
+#三者交集
+#9lncRNA heatmap
+lncRNA_CNV=read.table('D:\\CRC_lncRNA\\cnv\\percentCNV\\num2_normal_rec_0.25CNV_lncRNA.txt',check.names = F,stringsAsFactors = F)
+lncRNA_CNV=lncRNA_CNV[,1]
+
+intersect_normal_cnv_up_logFC=read.table('D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\num2_intersect_normal_cnv_up_logFC.txt',check.names = F,stringsAsFactors = F)
+intersect_normal_cnv_down_logFC=read.table('D:\\CRC_lncRNA\\cnv\\differentgene_updown_heatmap\\num2_intersect_normal_cnv_down_logFC.txt',check.names = F,stringsAsFactors = F)
+
+# lncRNA_CNV_up=intersect_normal_cnv_up_logFC[rownames(intersect_normal_cnv_up_logFC)%in%lncRNA_CNV,]
+# lncRNA_CNV_down=intersect_normal_cnv_down_logFC[rownames(intersect_normal_cnv_down_logFC)%in%lncRNA_CNV,]
+
+#正常和肿瘤
+countData_all_lncRNA=countData_all[rownames(countData_all)%in%lncRNA_CNV,]
+group_list_normal<- factor(c(rep('normal',20),rep('tumor',20)))
+countData_all_lncRNA2=countData_all_lncRNA
+countData_all_lncRNA2=matrix(as.numeric(unlist(countData_all_lncRNA2)),ncol=ncol(countData_all_lncRNA2))
+rownames(countData_all_lncRNA2)=rownames(countData_all_lncRNA)
+colnames(countData_all_lncRNA2)=colnames(countData_all_lncRNA)
+upregulateMatrix=countData_all_lncRNA2[,c(1:10,31:40,11:30)]
+lncRNA_rec_normal_cnv=countData_all_lncRNA2[,c(1:10,31:40,11:30)]
+write.table(lncRNA_rec_normal_cnv,"D:\\CRC_lncRNA\\cnv\\percentCNV\\lncRNA_rec_normal_cnv.txt",quote=F,sep='\t')
+sampleInfo=data.frame(colnames(upregulateMatrix),Subset=group_list_normal)
+colnum=2
+pdf("D:\\CRC_lncRNA\\cnv\\percentCNV\\9lncRNAlncRNA_CNV_nomal.pdf")
+source('D:\\R\\heatmap.R')
+dev.off()
+
+
+#复发未复发
+rec_DESeq2_edgeR_res_intersect_down=read.table('D:\\CRC_lncRNA\\diffexp\\rec_DESeq2_edgeR_res_intersect_down.txt',check.names = F,stringsAsFactors = F)
+rec_DESeq2_edgeR_res_intersect_up=read.table('D:\\CRC_lncRNA\\diffexp\\rec_DESeq2_edgeR_res_intersect_up.txt',check.names = F,stringsAsFactors = F)
+rec_DESeq2_edgeR_res_intersect_up_down=rbind(rec_DESeq2_edgeR_res_intersect_up,rec_DESeq2_edgeR_res_intersect_down)
+rec_DESeq2_edgeR_res_intersect_up_down_logFC=rec_DESeq2_edgeR_res_intersect_up_down[rownames(rec_DESeq2_edgeR_res_intersect_up_down)%in%lncRNA_CNV,c(2,3)]
+rec_DESeq2_edgeR_res_intersect_up_down_logFC=rec_DESeq2_edgeR_res_intersect_up_down_logFC[order(rec_DESeq2_edgeR_res_intersect_up_down_logFC[,1],decreasing = T),]
+group_list_rec=factor(c(rep('rec',10),rep('norec',10)))
+upregulateMatrix2=countData_all_lncRNA2[,c(11:30)]
+upregulateMatrix=upregulateMatrix2[(rownames(rec_DESeq2_edgeR_res_intersect_up_down_logFC)),]
+sampleInfo=data.frame(colnames(upregulateMatrix),Subset=group_list_rec)
+colnum=2
+pdf("D:\\CRC_lncRNA\\cnv\\percentCNV\\9lncRNAlncRNA_CNV_rec.pdf")
+source('D:\\R\\heatmap.R')
+dev.off()
+
+
+####################
+#lncRNA和其附近的蛋白质编码基因相关性散点图
+lncRNA_rec_normal_cnv=read.table("D:\\CRC_lncRNA\\cnv\\percentCNV\\lncRNA_rec_normal_cnv.txt",check.names = F,sep='\t')
+
+lncRNA_CNV_nearcoding=c()
+L=strsplit(rownames(lncRNA_rec_normal_cnv), "-")
+for (k in 1:length(rownames(lncRNA_rec_normal_cnv))){
+  if (L[[k]][1]=="LINC"){
+    lncRNA_CNV_nearcoding=c(lncRNA_CNV_nearcoding,L[[k]][2])
+  }else{
+    lncRNA_CNV_nearcoding=c(lncRNA_CNV_nearcoding,L[[k]][1])
+  }
+}
+
+nearcoding=read.table('D:\\CRC_lncRNA\\filter\\RSEM_expression\\pcRNA.rsem.FPKM_sort.txt',check.names = F,sep='\t')
+nearcoding=nearcoding[,c(1:10,31:40,11:30)]
+# nearcodingene=read.table('D:\\CRC_lncRNA\\cnv\\percentCNV\\num2_normal_rec_0.25CNV_lncRNA_nearcoding.txt',check.names = F,sep='\t')
+nearcoding_data=nearcoding[rownames(nearcoding)%in%lncRNA_CNV_nearcoding,]
+nearcoding_data_order=nearcoding_data[lncRNA_CNV_nearcoding,]
+library(ggplot2)
+
+for (i in c(6:length(lncRNA_CNV_nearcoding))){
+  print (i)
+  cor_num=cor(as.numeric(lncRNA_rec_normal_cnv[i,]),as.numeric(nearcoding_data_order[i,]))
+  gendata=rbind(lncRNA_rec_normal_cnv[i,],nearcoding_data_order[i,])
+  gendata_t=data.frame(t(gendata))
+  colnames(gendata_t)=c("lncRNA","coding")
+  print (rownames(gendata)[1])
+  pdf(paste('D:\\CRC_lncRNA\\TCGA_survive\\cor_with_nearcodinggene\\',rownames(gendata)[1],"_point_cor.pdf",sep=''))
+  sp2=ggplot(gendata_t, aes(x=lncRNA, y=coding)) +geom_point()+labs(title =  paste("cor:",cor_num,sep = ''))
+  sp2+theme_bw() + theme(legend.title=element_blank(),legend.position=c(0.8,0.3),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 15, face = "bold"),axis.title.y= element_text(size = 15, face = "bold"))
+  dev.off()
+}
+
+
+
+
 #############
 #上下调基因和cnv 的Amp和Del，卡方检验
 setwd('D:\\CRC_lncRNA\\cnv\\percentCNV')

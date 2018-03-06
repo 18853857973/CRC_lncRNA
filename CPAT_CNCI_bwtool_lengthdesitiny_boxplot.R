@@ -95,7 +95,7 @@ y=ecdf(x)
 df3<-data.frame(x=x,y=y(x))
 pdf(file="D:\\CRC_lncRNA\\coding_potential\\CPAT\\CPAT.pdf")
 sp2=ggplot(df1, aes(x,y)) +geom_line(size = 1.5,aes(color="known"))+geom_line(size = 1.5,data=df2,aes(color="novel"))+geom_line(size = 1.5,data=df3,aes(color="protein"))+labs(color="Legend text")+xlab("") + ylab("") 
-sp2+theme_bw() + theme(legend.title=element_blank(),legend.position=c(0.8,0.3),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 15, face = "bold"),axis.title.y= element_text(size = 15, face = "bold"))
+sp2+theme_bw() + theme(legend.title=element_blank(),legend.position=c(0.8,0.15),panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),axis.line = element_line(colour = "black"),axis.title.x = element_text(size = 15, face = "bold"),axis.title.y= element_text(size = 15, face = "bold"))
 dev.off()
 
 ###CNCI###
